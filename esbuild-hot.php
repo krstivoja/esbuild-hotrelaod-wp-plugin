@@ -42,7 +42,7 @@ add_action('admin_enqueue_scripts', 'my_plugin_enqueue_admin_styles');
 
 // -----------------------------------------------------------------------------
 // Inject the WebSocket script.
-// We will only inject the script if the .env file exists.
+// We will t
 // -----------------------------------------------------------------------------
 
 function hot_reload_websocket()
