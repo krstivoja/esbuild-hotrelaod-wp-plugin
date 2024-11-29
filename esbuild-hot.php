@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
 }
 
 
-define('MY_PLUGIN_URL', plugin_dir_url(__FILE__));
+
 
 require_once plugin_dir_path(__FILE__) . 'inc/settings-page.php';
 
@@ -44,6 +44,7 @@ add_action('admin_enqueue_scripts', 'my_plugin_enqueue_admin_styles');
 // Inject the WebSocket script.
 // We will t
 // -----------------------------------------------------------------------------
+define('WEBSOCKET_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 function hot_reload_websocket()
 {
@@ -53,13 +54,13 @@ function hot_reload_websocket()
     );
 
     $inline_ws_content = "
-        const ws = new WebSocket('ws://" . PROXY_URL . ":8080');
+        const ws = new WebSocket('ws://" . PROXY_URL . ":3000');
         ws.onmessage = async (event) => {
             if (event.data === 'reload') {
                 console.log('Reloading module...');
                 
                 // Dynamically import the updated module
-                const module = await import('" . MY_PLUGIN_URL . "/dist/bundle.js');
+                const module = await import('" . WEBSOCKET_PLUGIN_URL . "/dist/bundle.js');
                 
                 const link = document.querySelector(`#my-plugin-admin-styles-css`);
                 link.href = link.href.split('?')[0] + '?t=' + new Date().getTime();
@@ -98,9 +99,6 @@ if (file_exists(plugin_dir_path(__FILE__) . '.env')) {
     // Add WebSocket script
     add_action('admin_enqueue_scripts', 'hot_reload_websocket');
 }
-
-
-
 
 
 // -----------------------------------------------------------------------------
