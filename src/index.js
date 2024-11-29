@@ -4,7 +4,6 @@ console.log('Hello, world!!!!');
 
 // Function to initialize the application
 export function init() {
-    window.open();
     // Export the openTab function for use in other modules
     window.openTab = openTab;
 
