@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PROXY_URL', 'dev-lab.local');
+
 define('MY_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 require_once plugin_dir_path(__FILE__) . 'inc/settings-page.php';
@@ -44,6 +44,24 @@ add_action('admin_enqueue_scripts', 'my_plugin_enqueue_admin_styles');
 // Inject the WebSocket script.
 // We will t
 // -----------------------------------------------------------------------------
+
+function load_proxy_url()
+{
+    $env_path = plugin_dir_path(__FILE__) . '.env';
+
+    if (file_exists($env_path)) {
+        // Parse .env file for PROXY_URL
+        $env_content = file_get_contents($env_path);
+        if (preg_match('/^PROXY_URL\s*=\s*(.+)$/m', $env_content, $matches)) {
+            return trim($matches[1]);
+        }
+    }
+
+    // Return null if .env file or PROXY_URL is missing
+    return null;
+}
+
+define('PROXY_URL', load_proxy_url());
 
 function hot_reload_websocket()
 {
