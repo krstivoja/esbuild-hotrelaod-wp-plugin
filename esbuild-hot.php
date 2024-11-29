@@ -45,24 +45,6 @@ add_action('admin_enqueue_scripts', 'my_plugin_enqueue_admin_styles');
 // We will t
 // -----------------------------------------------------------------------------
 
-function load_proxy_url()
-{
-    $env_path = plugin_dir_path(__FILE__) . '.env';
-
-    if (file_exists($env_path)) {
-        // Parse .env file for PROXY_URL
-        $env_content = file_get_contents($env_path);
-        if (preg_match('/^PROXY_URL\s*=\s*(.+)$/m', $env_content, $matches)) {
-            return trim($matches[1]);
-        }
-    }
-
-    // Return null if .env file or PROXY_URL is missing
-    return null;
-}
-
-define('PROXY_URL', load_proxy_url());
-
 function hot_reload_websocket()
 {
     wp_enqueue_script(
@@ -92,6 +74,28 @@ function hot_reload_websocket()
 
 // Function to check if .env file exists and enqueue WebSocket script if it does
 if (file_exists(plugin_dir_path(__FILE__) . '.env')) {
+
+
+    function load_proxy_url()
+    {
+        $env_path = plugin_dir_path(__FILE__) . '.env';
+
+        if (file_exists($env_path)) {
+            // Parse .env file for PROXY_URL
+            $env_content = file_get_contents($env_path);
+            if (preg_match('/^PROXY_URL\s*=\s*(.+)$/m', $env_content, $matches)) {
+                return trim($matches[1]);
+            }
+        }
+
+        // Return null if .env file or PROXY_URL is missing
+        return null;
+    }
+
+    // Load env URL
+    define('PROXY_URL', load_proxy_url());
+
+    // Add WebSocket script
     add_action('admin_enqueue_scripts', 'hot_reload_websocket');
 }
 
