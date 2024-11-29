@@ -14,5 +14,8 @@
     "browser-sync": "^3.0.3",
     "esbuild": "^0.24.0",
     "ws": "^8.18.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
   }
 }

@@ -2,15 +2,18 @@ const esbuild = require('esbuild');
 const WebSocket = require('ws');
 const browserSync = require('browser-sync').create();
 const os = require('os');
+require('dotenv').config();
 
 const isWatch = process.argv.includes('--watch');
+
+const proxyUrl = process.env.PROXY_URL;
 
 // WebSocket server for hot reload
 let wss;
 if (isWatch) {
     const wsPort = 8080; // Change this to your desired port
     const wsHost = os.hostname(); // Get the hostname of the machine
-    const wsUrl = `ws://dev-lab.local:${wsPort}`; // Set WebSocket URL based on the hostname
+    const wsUrl = `ws://${proxyUrl}:${wsPort}`; // Set WebSocket URL based on the hostname
     wss = new WebSocket.Server({ port: wsPort });
     console.log(`WebSocket server running on ${wsUrl}`);
 }
@@ -58,7 +61,7 @@ const build = async () => {
 
         // Start BrowserSync
         browserSync.init({
-            proxy: "dev-lab.local",
+            proxy: proxyUrl,
             files: ['dist/*.js', 'index.html', 'dist/*.css'], // Watch these files for live reload
             port: 3000, // Serve files on this port
             open: true, // Automatically open in the browser
