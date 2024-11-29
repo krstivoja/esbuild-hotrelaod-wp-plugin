@@ -35,29 +35,52 @@ function my_plugin_enqueue_admin_styles($hook_suffix)
             filemtime(plugin_dir_path(__FILE__) . 'dist/bundle.js'), // Cache busting.
             true // Load in footer.
         );
-
-        wp_enqueue_script(
-            'my-plugin-ws-scripts',
-            'http://'
-        );
-
-        $inline_ws_content = "
-            const ws = new WebSocket('ws://".PROXY_URL.":8080');
-            ws.onmessage = async (event) => {
-                if (event.data === 'reload') {
-                    console.log('Reloading module...');
-                    
-                    // Dynamically import the updated module
-                    const module = await import('".MY_PLUGIN_URL."/dist/bundle.js');
-                    
-                    const link = document.querySelector(`#my-plugin-admin-styles-css`);
-                    link.href = link.href.split('?')[0] + '?t=' + new Date().getTime();
-                }
-            };
-
-            ws.onerror = (error) => console.error('WebSocket error:', error);
-        ";
-        wp_add_inline_script('my-plugin-ws-scripts', $inline_ws_content);
     }
 }
 add_action('admin_enqueue_scripts', 'my_plugin_enqueue_admin_styles');
+
+
+// -----------------------------------------------------------------------------
+// Inject the WebSocket script.
+// We will only inject the script if the .env file exists.
+// -----------------------------------------------------------------------------
+
+function hot_reload_websocket()
+{
+    wp_enqueue_script(
+        'my-plugin-ws-scripts',
+        'http://'
+    );
+
+    $inline_ws_content = "
+        const ws = new WebSocket('ws://" . PROXY_URL . ":8080');
+        ws.onmessage = async (event) => {
+            if (event.data === 'reload') {
+                console.log('Reloading module...');
+                
+                // Dynamically import the updated module
+                const module = await import('" . MY_PLUGIN_URL . "/dist/bundle.js');
+                
+                const link = document.querySelector(`#my-plugin-admin-styles-css`);
+                link.href = link.href.split('?')[0] + '?t=' + new Date().getTime();
+            }
+        };
+
+        ws.onerror = (error) => console.error('WebSocket error:', error);
+    ";
+
+    wp_add_inline_script('my-plugin-ws-scripts', $inline_ws_content);
+}
+
+// Function to check if .env file exists and enqueue WebSocket script if it does
+if (file_exists(plugin_dir_path(__FILE__) . '.env')) {
+    add_action('admin_enqueue_scripts', 'hot_reload_websocket');
+}
+
+
+
+
+
+// -----------------------------------------------------------------------------
+// End of Inject the WebSocket script.
+// -----------------------------------------------------------------------------
