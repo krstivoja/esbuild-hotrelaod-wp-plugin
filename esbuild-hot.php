@@ -59,7 +59,7 @@ function hot_reload_websocket()
                 console.log('Reloading module...');
                 
                 // Dynamically import the updated module
-                const module = await import('" . MY_PLUGIN_URL . "/dist/bundle.js');
+                const module = await import('" . MY_PLUGIN_URL . "dist/bundle.js' + '?t=' + new Date().getTime());
                 
                 const link = document.querySelector(`#my-plugin-admin-styles-css`);
                 link.href = link.href.split('?')[0] + '?t=' + new Date().getTime();
